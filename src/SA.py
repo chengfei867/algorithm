@@ -44,8 +44,7 @@ def main():
     global bestPath, bestDistance
     ## 设置初始参数
     T = 1000.0  # 初始温度
-    ALPHA = 0.95  # 降温幅度系数
-    K = 1000  # 每个温度下迭代次数
+    ALPHA = 0.98  # 降温幅度系数
     # 初始解
     currentPath = getPathRandomly()
     # currentPath = list(range(30))
