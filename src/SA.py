@@ -38,14 +38,13 @@ for i in range(city_num):
         distance_city[i][j] = int(
             math.sqrt((position_x[i] - position_x[j]) ** 2 + (position_y[i] - position_y[j]) ** 2))
 
-
 # 主函数
 def main():
     global itor
     global bestPath, bestDistance
     ## 设置初始参数
     T = 1000.0  # 初始温度
-    ALPHA = 0.99  # 降温幅度系数
+    ALPHA = 0.95  # 降温幅度系数
     K = 1000  # 每个温度下迭代次数
     # 初始解
     currentPath = getPathRandomly()
@@ -55,7 +54,7 @@ def main():
     bestPath, bestDistance = currentPath, currentDistance
     # 进入循环
     while T > 0.1:
-        K = 100
+        K = 1000
         while K > 0:
             # 新解
             itor += 1
@@ -102,9 +101,9 @@ def getPathRandomly():
     # 找到的新解的路径
     path = []
     # 每次访问一个城市就将其编号从中删除其中
-    accessed = [i for i in range(30)]
+    accessed = [i for i in range(city_num)]
     # 生成随机初始出发城市
-    start_city = random.randint(0, 29)
+    start_city = random.randint(0, city_num-1)
     path.append(start_city)  # 将初始城市加入路径列表
     accessed.remove(start_city)  # 将初始城市加入访问列表
     # 循环直到所有城市都遍历到
@@ -112,15 +111,11 @@ def getPathRandomly():
         new_city = random.choice(accessed)  # 从未访问列表中随机选择一个城市
         path.append(new_city)  # 将新城市加入路径列表
         accessed.remove(new_city)  # 更新访问集合
-        current_city = new_city  # 将当前城市更新为最新城市
-    path.append(start_city)  # 循环结束后需要从最后的城市返回初始城市
     return path
 
 
 # 在当前最优解的基础上生成新解
 def getPathBaseOnPath(currentPath):
-    # 找到的新解的路径
-    newPath = []
     # 找到的新解的距离
     distance = 0
     # 1 随机交换两个城市的位置
@@ -156,7 +151,7 @@ def swapRandomly(currentPath):
     newPath = currentPath.copy()
     # print(f"原路径{currentPath}")
     # 随机生成两个城市索引
-    city_index = random.sample(range(30), 2)
+    city_index = random.sample(range(city_num), 2)
     # 交换原路径处于这两个索引位置的城市编号
     newPath[city_index[0]], newPath[city_index[1]] = newPath[city_index[1]], newPath[city_index[0]]
     # print(f"新路径{currentPath}")
@@ -168,7 +163,7 @@ def partialInversion(currentPath):
     newPath = currentPath.copy()
     # print(f"原路径{currentPath}")
     # 随机生成两个城市索引
-    city_index = random.sample(range(30), 2)
+    city_index = random.sample(range(city_num), 2)
     # 确保start_index小于end_index
     start_index, end_index = min(city_index[0], city_index[1]), max(city_index[0], city_index[1])
     # 反转
@@ -181,7 +176,7 @@ def insertRandomly(currentPath):
     newPath = currentPath.copy()
     # print(f"insertRandomly原路径{currentPath}")
     # 随机生成一个城市索引和插入位置
-    city_index = random.sample(range(30), 2)
+    city_index = random.sample(range(city_num), 2)
     # 删除并拿到第一个索引城市编号
     temp_city_index = newPath.pop(city_index[0])
     # 插入新位置
@@ -197,7 +192,7 @@ def getDistanceByPath(path):
     # 计算距离
     for i in range(len(path) - 1):
         distance += distance_city[path[i]][path[i + 1]]
-    distance += distance_city[path[0]][path[29]]
+    distance += distance_city[path[0]][path[city_num-1]]
     return distance
 
 
@@ -207,7 +202,6 @@ def isAccept(oldDist, newDist, T):
     if distGap < 0 or random.random() < math.exp(-(distGap) / T):
         return True
     return False
-
 
 def plot_points(path):
     x_coords = []
